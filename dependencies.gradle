@@ -1,0 +1,42 @@
+ext {
+
+    def supportLibraries_version = '27.1.1'
+    def constraint_version = '1.1.0'
+    supportLibraries = [
+            v4: "com.android.support:support-v4:$supportLibraries_version",
+            v7: "com.android.support:appcompat-v7:$supportLibraries_version",
+            constraint: "com.android.support.constraint:constraint-layout:$constraint_version",
+            design: "com.android.support:design:$supportLibraries_version",
+            recyclerView: "com.android.support:recyclerview-v7:$supportLibraries_version"
+    ]
+
+    def playServices_version = "15.0.1"
+    playServices = [
+            maps: "com.google.android.gms:play-services-maps:$playServices_version"
+    ]
+
+    def junit_version = '4.12'
+    unitTest = [
+            junit: "junit:junit:$junit_version"
+    ]
+
+    def rxJava_version = '2.1.14'
+    def rxAndroid_version = '2.0.2'
+    rx = [
+            java: "io.reactivex.rxjava2:rxjava:$rxJava_version",
+            android: "io.reactivex.rxjava2:rxandroid:$rxAndroid_version"
+    ]
+
+    def dagger2_version = '2.16'
+    dagger2 = [
+            core: "com.google.dagger:dagger:$dagger2_version",
+            compiler: "com.google.dagger:dagger-compiler:$dagger2_version"
+    ]
+
+    def espresso_version = '3.0.2'
+    def runner_version = '1.0.2'
+    androidTest = [
+            espresso_core: "com.android.support.test.espresso:espresso-core:$espresso_version",
+            runner: "com.android.support.test:runner:$runner_version"
+    ]
+}
