@@ -17,6 +17,7 @@ public class CloserDatabaseHelper extends SQLiteOpenHelper {
             ReminderContract.ReminderEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE," +
             ReminderContract.ReminderEntry.COLUMN_NAME_TITLE + " INTEGER NOT NULL," +
             ReminderContract.ReminderEntry.COLUMN_NAME_DESCRIPTION + " TEXT NOT NULL," +
+            ReminderContract.ReminderEntry.COLUMN_LOCATION_NAME + " TEXT NOT NULL," +
             ReminderContract.ReminderEntry.COLUMN_NAME_LAT + " TEXT NOT NULL," +
             ReminderContract.ReminderEntry.COLUMN_NAME_LNG + " TEXT NOT NULL" +
             ");";

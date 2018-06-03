@@ -6,6 +6,9 @@ import android.provider.BaseColumns;
 import com.regmoraes.closer.BuildConfig;
 import com.regmoraes.closer.data.entity.Reminder;
 
+/**
+ * Copyright {2018} {Rômulo Eduardo G. Moraes}
+ **/
 public final class ReminderContract {
 
     public static final String AUTHORITY = BuildConfig.APPLICATION_ID;
@@ -27,23 +30,23 @@ public final class ReminderContract {
         public static final String COLUMN_LOCATION_NAME = "location_name";
         public static final String COLUMN_NAME_LAT = "lat";
         public static final String COLUMN_NAME_LNG = "lng";
-    }
 
-    public interface Query {
-        String[] PROJECTION = {
-                ReminderEntry._ID,
-                ReminderEntry.COLUMN_NAME_TITLE,
-                ReminderEntry.COLUMN_NAME_DESCRIPTION,
-                ReminderEntry.COLUMN_LOCATION_NAME,
-                ReminderEntry.COLUMN_NAME_LAT,
-                ReminderEntry.COLUMN_NAME_LNG
-        };
+        public interface Query {
+            String[] PROJECTION = {
+                    ReminderEntry._ID,
+                    ReminderEntry.COLUMN_NAME_TITLE,
+                    ReminderEntry.COLUMN_NAME_DESCRIPTION,
+                    ReminderEntry.COLUMN_LOCATION_NAME,
+                    ReminderEntry.COLUMN_NAME_LAT,
+                    ReminderEntry.COLUMN_NAME_LNG
+            };
 
-        int _ID = 0;
-        int TITLE = 1;
-        int DESCRIPTION = 2;
-        int LOCATION_NAME = 2;
-        int LAT = 3;
-        int LNG = 4;
+            int _ID = 0;
+            int TITLE = 1;
+            int DESCRIPTION = 2;
+            int LOCATION_NAME = 3;
+            int LAT = 4;
+            int LNG = 5;
+        }
     }
 }

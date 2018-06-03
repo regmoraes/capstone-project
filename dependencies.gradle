@@ -1,5 +1,8 @@
 ext {
 
+    gradlePlugin_version = '3.1.2'
+    playServicesPlugin_version = '4.0.1'
+
     def supportLibraries_version = '27.1.1'
     def constraint_version = '1.1.0'
     supportLibraries = [
@@ -10,9 +13,14 @@ ext {
             recyclerView: "com.android.support:recyclerview-v7:$supportLibraries_version"
     ]
 
+    def timber_version = '4.7.0'
+    timber = [ "com.jakewharton.timber:timber:$timber_version" ]
+
     def playServices_version = "15.0.1"
     playServices = [
-            maps: "com.google.android.gms:play-services-maps:$playServices_version"
+            location: "com.google.android.gms:play-services-location:$playServices_version",
+            maps: "com.google.android.gms:play-services-maps:$playServices_version",
+            places: "com.google.android.gms:play-services-places:$playServices_version"
     ]
 
     def junit_version = '4.12'

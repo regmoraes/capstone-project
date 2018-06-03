@@ -1,4 +1,13 @@
 <resources>
     <string name="app_name">Closer</string>
     <string name="action_settings">Settings</string>
+
+    <!-- Reminders -->
+    <string name="reminder_title_hint">Title</string>
+    <string name="reminder_description_hint">Description</string>
+    <string name="reminder_place_hint">Select a place</string>
+
+    <!-- Buttons and Dialogs -->
+    <string name="button_confirm">Confirm</string>
+
 </resources>

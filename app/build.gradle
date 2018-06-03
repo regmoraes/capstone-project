@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
-apply from: rootProject.file('dependencies.gradle')
+apply from: rootProject.file("dependencies.gradle")
+apply from: rootProject.file("keys.gradle")
 
 android {
 
@@ -17,6 +18,8 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        resValue ("string", "places_api_key", placesApiKey.default)
     }
 
     dataBinding {
@@ -38,7 +41,8 @@ dependencies {
             supportLibraries.values(),
             playServices.values(),
             rx.values(),
-            dagger2.core
+            dagger2.core,
+            timber
     )
 
     annotationProcessor (

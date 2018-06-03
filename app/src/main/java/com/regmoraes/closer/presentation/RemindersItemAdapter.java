@@ -24,7 +24,7 @@ public class RemindersItemAdapter extends RecyclerView.Adapter<RemindersItemAdap
     @Override
     public long getItemId(int position) {
         mCursor.moveToPosition(position);
-        return mCursor.getLong(ReminderContract.Query._ID);
+        return mCursor.getLong(ReminderContract.ReminderEntry.Query._ID);
     }
 
     @NonNull
@@ -45,6 +45,11 @@ public class RemindersItemAdapter extends RecyclerView.Adapter<RemindersItemAdap
         mCursor.moveToPosition(position);
 
         holder.bind(mCursor);
+    }
+
+    @Override
+    public void setHasStableIds(boolean hasStableIds) {
+        super.setHasStableIds(true);
     }
 
     @Override
@@ -82,8 +87,8 @@ public class RemindersItemAdapter extends RecyclerView.Adapter<RemindersItemAdap
         }
     }
 
-    public void setData(Cursor cursor){
-        this.mCursor = cursor;
+    public void setData(Cursor newCursor){
+        mCursor = newCursor;
         notifyDataSetChanged();
     }
 }

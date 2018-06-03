@@ -73,26 +73,23 @@ public class RemindersActivity extends AppCompatActivity
     }
 
     private void loadData() {
-
         getSupportLoaderManager().initLoader(0, null, this);
     }
 
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
-
         return remindersManager.getRemindersCursorLoader(this);
     }
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
-
         remindersItemAdapter.setData(cursor);
     }
 
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-
+        remindersItemAdapter.setData(null);
     }
 
     @Override

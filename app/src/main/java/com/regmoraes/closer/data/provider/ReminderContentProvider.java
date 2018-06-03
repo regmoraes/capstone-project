@@ -48,18 +48,36 @@ public class ReminderContentProvider extends ContentProvider {
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
 
-        if(sUriMatcher.match(uri) == REMINDERS){
-            final SQLiteDatabase mDb = mCloserDbHelper.getReadableDatabase();
+        final SQLiteDatabase mDb = mCloserDbHelper.getReadableDatabase();
+        Cursor mCursor;
 
-            Cursor mCursor = mDb.query(TABLE_NAME, projection, selection, selectionArgs,
-                    null, null, sortOrder);
+        switch (sUriMatcher.match(uri)) {
 
-            mCursor.setNotificationUri(getContext().getContentResolver(), uri);
+            case REMINDERS: {
 
-            return mCursor;
+                mCursor = mDb.query(TABLE_NAME, projection, selection, selectionArgs,
+                        null, null, sortOrder);
 
-        } else {
-            throw new UnsupportedOperationException("Unknown uri " + uri);
+                mCursor.setNotificationUri(getContext().getContentResolver(), uri);
+
+                return mCursor;
+            }
+
+            case REMINDER_WITH_ID: {
+
+                final String id = uri.getLastPathSegment();
+
+                mCursor = mDb.query(
+                        ReminderContract.ReminderEntry.TABLE_NAME, null,"_id = ?",
+                        new String[]{id}, null, null, null);
+
+                mCursor.setNotificationUri(getContext().getContentResolver(), uri);
+
+                return mCursor;
+            }
+
+            default:
+                throw new UnsupportedOperationException("Unknown uri " + uri);
         }
     }
 
@@ -68,6 +86,7 @@ public class ReminderContentProvider extends ContentProvider {
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
 
         if(sUriMatcher.match(uri) == REMINDERS) {
+
             final SQLiteDatabase mDb = mCloserDbHelper.getWritableDatabase();
 
             long _id = mDb.insert(TABLE_NAME, null, values);
@@ -92,13 +111,13 @@ public class ReminderContentProvider extends ContentProvider {
 
             String id = uri.getLastPathSegment();
 
-            int favoritesDeleted = db.delete(ReminderContract.ReminderEntry.TABLE_NAME, "_id=?", new String[]{id});
+            int remindersDeleted = db.delete(ReminderContract.ReminderEntry.TABLE_NAME, "_id=?", new String[]{id});
 
-            if (favoritesDeleted != 0) {
+            if (remindersDeleted != 0) {
                 getContext().getContentResolver().notifyChange(uri, null);
             }
 
-            return favoritesDeleted;
+            return remindersDeleted;
 
         } else {
             throw new UnsupportedOperationException("Unknown uri " + uri);

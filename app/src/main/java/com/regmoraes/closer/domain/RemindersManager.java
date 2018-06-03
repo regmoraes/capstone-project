@@ -3,11 +3,13 @@ package com.regmoraes.closer.domain;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.content.CursorLoader;
 
 import com.regmoraes.closer.data.database.ReminderContract;
 import com.regmoraes.closer.data.entity.Reminder;
+import com.regmoraes.closer.data.entity.ReminderMapper;
 
 import javax.inject.Inject;
 
@@ -17,18 +19,19 @@ import javax.inject.Inject;
 public class RemindersManager {
 
     private ContentResolver mContentResolver;
+    private GeofencesManager mGeofencesManager;
 
     @Inject
-    public RemindersManager(ContentResolver contentResolver) {
+    public RemindersManager(ContentResolver contentResolver, GeofencesManager geofencesManager) {
         this.mContentResolver = contentResolver;
-
+        this.mGeofencesManager = geofencesManager;
     }
 
     public CursorLoader getRemindersCursorLoader(Context context) {
 
-        Uri remindersUri = ReminderContract.BASE_URI_CONTENT;
+        Uri remindersUri = ReminderContract.ReminderEntry.CONTENT_URI;
 
-        return new CursorLoader(context, remindersUri, ReminderContract.Query.PROJECTION, null,
+        return new CursorLoader(context, remindersUri, ReminderContract.ReminderEntry.Query.PROJECTION, null,
                 null, null);
 
 //        Cursor cursor = mContentResolver.query(ReminderContract.ReminderEntry.CONTENT_URI,
@@ -60,21 +63,45 @@ public class RemindersManager {
 //        return cursor;
     }
 
-    public long insertReminder(Reminder reminder) {
+    public Cursor getReminder(int reminderId) {
+
+        final Uri uri = ReminderContract.ReminderEntry.CONTENT_URI
+                .buildUpon().appendPath(String.valueOf(reminderId)).build();
+
+        return mContentResolver.query(uri,
+                ReminderContract.ReminderEntry.Query.PROJECTION,
+                null, null, null);
+    }
+
+    public int insertReminder(Reminder reminder) {
 
         final ContentValues mValues = new ContentValues();
-            mValues.put(ReminderContract.ReminderEntry.COLUMN_NAME_TITLE, reminder.getTitle());
-            mValues.put(ReminderContract.ReminderEntry.COLUMN_NAME_DESCRIPTION, reminder.getDescription());
-            mValues.put(ReminderContract.ReminderEntry.COLUMN_NAME_LAT, reminder.getLat());
-            mValues.put(ReminderContract.ReminderEntry.COLUMN_NAME_LNG, reminder.getLng());
+        mValues.put(ReminderContract.ReminderEntry.COLUMN_NAME_TITLE, reminder.getTitle());
+        mValues.put(ReminderContract.ReminderEntry.COLUMN_NAME_DESCRIPTION, reminder.getDescription());
+        mValues.put(ReminderContract.ReminderEntry.COLUMN_LOCATION_NAME, reminder.getLocationName());
+        mValues.put(ReminderContract.ReminderEntry.COLUMN_NAME_LAT, reminder.getLat());
+        mValues.put(ReminderContract.ReminderEntry.COLUMN_NAME_LNG, reminder.getLng());
 
-            Uri mUri = mContentResolver.insert(ReminderContract.ReminderEntry.CONTENT_URI, mValues);
+        Uri mUri = mContentResolver.insert(ReminderContract.ReminderEntry.CONTENT_URI, mValues);
 
-            if(mUri != null) {
-                return Integer.valueOf(mUri.getLastPathSegment());
-            } else {
-                return -1L;
-            }
+        if(mUri != null) {
+
+            Integer reminderId = Integer.valueOf(mUri.getLastPathSegment());
+
+            Cursor cursor = getReminder(reminderId);
+            cursor.moveToFirst();
+
+            Reminder insertedReminder = ReminderMapper.fromCursor(cursor);
+
+            cursor.close();
+
+            mGeofencesManager.createGeofenceForReminder(insertedReminder);
+
+            return reminderId;
+
+        } else {
+            return -1;
+        }
     }
 
     public int updateReminder(Reminder reminder) {
@@ -82,6 +109,7 @@ public class RemindersManager {
         final ContentValues mValues = new ContentValues();
         mValues.put(ReminderContract.ReminderEntry.COLUMN_NAME_TITLE, reminder.getTitle());
         mValues.put(ReminderContract.ReminderEntry.COLUMN_NAME_DESCRIPTION, reminder.getDescription());
+        mValues.put(ReminderContract.ReminderEntry.COLUMN_LOCATION_NAME, reminder.getLocationName());
         mValues.put(ReminderContract.ReminderEntry.COLUMN_NAME_LAT, reminder.getLat());
         mValues.put(ReminderContract.ReminderEntry.COLUMN_NAME_LNG, reminder.getLng());
 
