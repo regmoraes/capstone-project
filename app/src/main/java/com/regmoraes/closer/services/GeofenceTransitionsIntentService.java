@@ -2,11 +2,19 @@ package com.regmoraes.closer.services;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.database.Cursor;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
+import com.regmoraes.closer.CloserApp;
+import com.regmoraes.closer.data.entity.Reminder;
+import com.regmoraes.closer.data.entity.ReminderMapper;
+import com.regmoraes.closer.domain.RemindersManager;
+import com.regmoraes.closer.notification.NotificationUtils;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 import timber.log.Timber;
 
@@ -15,12 +23,18 @@ import timber.log.Timber;
  **/
 public class GeofenceTransitionsIntentService extends IntentService {
 
-    public GeofenceTransitionsIntentService(String name) {
-        super(name);
-    }
+    @Inject
+    public RemindersManager remindersManager;
 
     public GeofenceTransitionsIntentService() {
         super(GeofenceTransitionsIntentService.class.getSimpleName() + " created");
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        ((CloserApp) getApplication()).getComponentsInjector().inject(this);
     }
 
     protected void onHandleIntent(Intent intent) {
@@ -28,9 +42,8 @@ public class GeofenceTransitionsIntentService extends IntentService {
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
 
         if (geofencingEvent.hasError()) {
-//            String errorMessage = GeofenceErrorMessages.getErrorString(this,
-//                    geofencingEvent.getErrorCode());
 
+            Timber.e("Geofence Error: %s", String.valueOf(geofencingEvent.getErrorCode()));
             return;
         }
 
@@ -47,7 +60,29 @@ public class GeofenceTransitionsIntentService extends IntentService {
 
             // Get the transition details as a String.
             Timber.d("Geofences: %s", triggeringGeofences.toString());
+
             // Send notification and log the transition details.
+            for(Geofence geofence: triggeringGeofences) {
+
+                Cursor cursor = remindersManager.getReminder(Integer.valueOf(geofence.getRequestId()));
+
+                if(cursor != null) {
+
+                    cursor.moveToFirst();
+
+                    while(!cursor.isAfterLast()) {
+
+                        Reminder reminder = ReminderMapper.fromCursor(cursor);
+
+                        NotificationUtils
+                                .sendNotificationForReminder(getApplicationContext(), reminder);
+
+                        cursor.moveToNext();
+                    }
+
+                    cursor.close();
+                }
+            }
 
         } else {
             // Log the error.

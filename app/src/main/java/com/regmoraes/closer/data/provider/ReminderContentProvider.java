@@ -60,6 +60,8 @@ public class ReminderContentProvider extends ContentProvider {
 
                 mCursor.setNotificationUri(getContext().getContentResolver(), uri);
 
+                getContext().getContentResolver().notifyChange(uri, null);
+
                 return mCursor;
             }
 
@@ -72,6 +74,8 @@ public class ReminderContentProvider extends ContentProvider {
                         new String[]{id}, null, null, null);
 
                 mCursor.setNotificationUri(getContext().getContentResolver(), uri);
+
+                getContext().getContentResolver().notifyChange(uri, null);
 
                 return mCursor;
             }
@@ -111,7 +115,7 @@ public class ReminderContentProvider extends ContentProvider {
 
             String id = uri.getLastPathSegment();
 
-            int remindersDeleted = db.delete(ReminderContract.ReminderEntry.TABLE_NAME, "_id=?", new String[]{id});
+            int remindersDeleted = db.delete(ReminderContract.ReminderEntry.TABLE_NAME, "_id = ?", new String[]{id});
 
             if (remindersDeleted != 0) {
                 getContext().getContentResolver().notifyChange(uri, null);
@@ -133,7 +137,7 @@ public class ReminderContentProvider extends ContentProvider {
 
             String id = uri.getLastPathSegment();
 
-            int remindersUpdated = db.update(ReminderContract.ReminderEntry.TABLE_NAME, values,"_id=?", new String[]{id});
+            int remindersUpdated = db.update(ReminderContract.ReminderEntry.TABLE_NAME, values,"_id = ?", new String[]{id});
 
             if (remindersUpdated != 0) {
                 getContext().getContentResolver().notifyChange(uri, null);

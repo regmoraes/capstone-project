@@ -14,6 +14,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import com.regmoraes.closer.CloserApp;
 import com.regmoraes.closer.R;
 import com.regmoraes.closer.databinding.ActivityRemindersBinding;
+import com.regmoraes.closer.domain.GeofencesManager;
 import com.regmoraes.closer.domain.RemindersManager;
 
 import javax.inject.Inject;
@@ -28,6 +29,8 @@ public class RemindersActivity extends AppCompatActivity
 
     @Inject
     public RemindersManager remindersManager;
+    @Inject
+    public GeofencesManager geofencesManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +40,8 @@ public class RemindersActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         setUpView();
+
+        setUpGeofences();
 
         loadData();
     }
@@ -90,6 +95,10 @@ public class RemindersActivity extends AppCompatActivity
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
         remindersItemAdapter.setData(null);
+    }
+
+    private void setUpGeofences() {
+        geofencesManager.setUpGeofences();
     }
 
     @Override

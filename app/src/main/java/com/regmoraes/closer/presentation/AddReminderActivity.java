@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -15,6 +16,7 @@ import com.regmoraes.closer.CloserApp;
 import com.regmoraes.closer.R;
 import com.regmoraes.closer.data.entity.Reminder;
 import com.regmoraes.closer.databinding.ActivityAddReminderBinding;
+import com.regmoraes.closer.domain.GeofencesManager;
 import com.regmoraes.closer.domain.RemindersManager;
 
 import javax.inject.Inject;
@@ -22,11 +24,14 @@ import javax.inject.Inject;
 public class AddReminderActivity extends AppCompatActivity {
 
     private ActivityAddReminderBinding viewBinding;
-    private int PLACE_REQUEST_CODE = 101;
     private Reminder reminder = new Reminder();
+    private int PLACE_REQUEST_CODE = 101;
 
     @Inject
     public RemindersManager remindersManager;
+
+    @Inject
+    public GeofencesManager geofencesManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,34 +54,11 @@ public class AddReminderActivity extends AppCompatActivity {
 
         setSupportActionBar(viewBinding.included.toolbar);
 
-        viewBinding.buttonConfirm.setOnClickListener(__-> {
-
-            if(isReminderFieldsFilled()) {
-
-                fillReminderAtributes();
-
-                remindersManager.insertReminder(reminder);
-            }
-        });
-
-        viewBinding.editTextPlace.setOnClickListener(__-> {
-
-            try {
-
-                PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder();
-
-                Intent intent = intentBuilder.build(this);
-
-                startActivityForResult(intent, PLACE_REQUEST_CODE);
-
-            } catch (GooglePlayServicesRepairableException |
-                    GooglePlayServicesNotAvailableException e) {
-                e.printStackTrace();
-            }
-        });
+        viewBinding.buttonConfirm.setOnClickListener(onConfirmReminderClickListener);
+        viewBinding.editTextPlace.setOnClickListener(onEditPlaceClickListener);
     }
 
-    private void fillReminderAtributes() {
+    private void fillReminderAttributes() {
 
         reminder.title = viewBinding.editTextTitle.getText().toString();
         reminder.description = viewBinding.editTextDescription.getText().toString();
@@ -128,4 +110,36 @@ public class AddReminderActivity extends AppCompatActivity {
         }
     }
 
+    private View.OnClickListener onConfirmReminderClickListener = __->  {
+
+        if(isReminderFieldsFilled()) {
+
+            fillReminderAttributes();
+
+            int newReminderId = remindersManager.insertReminder(reminder);
+
+            if (newReminderId > 0) {
+
+                reminder.setId(newReminderId);
+
+                geofencesManager.createGeofenceForReminder(reminder);
+            }
+        }
+    };
+
+    private View.OnClickListener onEditPlaceClickListener = __-> {
+
+        try {
+
+            PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder();
+
+            Intent intent = intentBuilder.build(AddReminderActivity.this);
+
+            startActivityForResult(intent, PLACE_REQUEST_CODE);
+
+        } catch (GooglePlayServicesRepairableException |
+                GooglePlayServicesNotAvailableException e) {
+            e.printStackTrace();
+        }
+    };
 }

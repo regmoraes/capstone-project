@@ -9,7 +9,6 @@ import android.support.v4.content.CursorLoader;
 
 import com.regmoraes.closer.data.database.ReminderContract;
 import com.regmoraes.closer.data.entity.Reminder;
-import com.regmoraes.closer.data.entity.ReminderMapper;
 
 import javax.inject.Inject;
 
@@ -19,12 +18,10 @@ import javax.inject.Inject;
 public class RemindersManager {
 
     private ContentResolver mContentResolver;
-    private GeofencesManager mGeofencesManager;
 
     @Inject
-    public RemindersManager(ContentResolver contentResolver, GeofencesManager geofencesManager) {
+    public RemindersManager(ContentResolver contentResolver) {
         this.mContentResolver = contentResolver;
-        this.mGeofencesManager = geofencesManager;
     }
 
     public CursorLoader getRemindersCursorLoader(Context context) {
@@ -85,20 +82,7 @@ public class RemindersManager {
         Uri mUri = mContentResolver.insert(ReminderContract.ReminderEntry.CONTENT_URI, mValues);
 
         if(mUri != null) {
-
-            Integer reminderId = Integer.valueOf(mUri.getLastPathSegment());
-
-            Cursor cursor = getReminder(reminderId);
-            cursor.moveToFirst();
-
-            Reminder insertedReminder = ReminderMapper.fromCursor(cursor);
-
-            cursor.close();
-
-            mGeofencesManager.createGeofenceForReminder(insertedReminder);
-
-            return reminderId;
-
+            return Integer.valueOf(mUri.getLastPathSegment());
         } else {
             return -1;
         }

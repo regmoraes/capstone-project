@@ -15,10 +15,7 @@
         android:theme="@style/Closer.Theme">
 
         <service android:name=".services.GeofenceTransitionsIntentService" />
-
-        <service
-            android:name=".services.GeofencesBuilderIntentService"
-            android:exported="false"/>
+        <receiver android:name=".services.DoneReminderReceiver"/>
 
         <provider
             android:authorities="com.regmoraes.closer"

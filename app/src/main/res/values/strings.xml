@@ -8,6 +8,6 @@
     <string name="reminder_place_hint">Select a place</string>
 
     <!-- Buttons and Dialogs -->
-    <string name="button_confirm">Confirm</string>
+    <string name="confirm">Confirm</string>
 
 </resources>

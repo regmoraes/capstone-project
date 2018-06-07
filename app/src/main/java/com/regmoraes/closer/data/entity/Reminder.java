@@ -8,6 +8,8 @@ import android.os.Parcelable;
  **/
 public class Reminder implements Parcelable {
 
+    public static final String REMINDER_ID = "reminder-id";
+
     public Integer id;
     public String title;
     public String description;
