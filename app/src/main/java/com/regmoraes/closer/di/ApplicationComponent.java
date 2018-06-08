@@ -13,7 +13,7 @@ import dagger.Component;
  *   Copyright {2018} {Rômulo Eduardo G. Moraes}
  **/
 @Singleton
-@Component(modules = { AndroidModule.class })
+@Component(modules = { AndroidModule.class, DatabaseModule.class })
 public interface ApplicationComponent {
 
     void inject(RemindersActivity remindersActivity);

@@ -1,6 +1,5 @@
 package com.regmoraes.closer.di;
 
-import android.content.ContentResolver;
 import android.content.Context;
 
 import com.google.android.gms.location.GeofencingClient;
@@ -27,12 +26,6 @@ public class AndroidModule {
     @Provides
     public Context providesApplicationContext() {
         return this.context;
-    }
-
-    @Singleton
-    @Provides
-    public ContentResolver providesContentResolver() {
-        return this.context.getContentResolver();
     }
 
     @Singleton

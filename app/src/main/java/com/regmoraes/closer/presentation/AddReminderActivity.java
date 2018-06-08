@@ -14,7 +14,7 @@ import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.regmoraes.closer.CloserApp;
 import com.regmoraes.closer.R;
-import com.regmoraes.closer.data.entity.Reminder;
+import com.regmoraes.closer.data.database.Reminder;
 import com.regmoraes.closer.databinding.ActivityAddReminderBinding;
 import com.regmoraes.closer.domain.GeofencesManager;
 import com.regmoraes.closer.domain.RemindersManager;
@@ -60,9 +60,9 @@ public class AddReminderActivity extends AppCompatActivity {
 
     private void fillReminderAttributes() {
 
-        reminder.title = viewBinding.editTextTitle.getText().toString();
-        reminder.description = viewBinding.editTextDescription.getText().toString();
-        reminder.locationName = viewBinding.editTextPlace.getText().toString();
+        reminder.setTitle(viewBinding.editTextTitle.getText().toString());
+        reminder.setDescription(viewBinding.editTextDescription.getText().toString());
+        reminder.setLocationName(viewBinding.editTextPlace.getText().toString());
     }
 
     private boolean isReminderFieldsFilled() {
@@ -97,9 +97,9 @@ public class AddReminderActivity extends AppCompatActivity {
                 Place place = PlaceAutocomplete.getPlace(this, data);
                 String placeName = place.getName().toString();
 
-                reminder.locationName = placeName;
-                reminder.lat = place.getLatLng().latitude;
-                reminder.lng = place.getLatLng().longitude;
+                reminder.setLocationName(placeName);
+                reminder.setLatitude(place.getLatLng().latitude);
+                reminder.setLongitude(place.getLatLng().longitude);
 
                 viewBinding.editTextPlace.setText(placeName);
 
@@ -116,14 +116,7 @@ public class AddReminderActivity extends AppCompatActivity {
 
             fillReminderAttributes();
 
-            int newReminderId = remindersManager.insertReminder(reminder);
-
-            if (newReminderId > 0) {
-
-                reminder.setId(newReminderId);
-
-                geofencesManager.createGeofenceForReminder(reminder);
-            }
+            remindersManager.insertReminder(reminder);
         }
     };
 

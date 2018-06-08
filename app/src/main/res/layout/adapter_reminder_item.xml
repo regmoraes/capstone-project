@@ -6,7 +6,7 @@
     <data>
         <variable
             name="reminder"
-            type="com.regmoraes.closer.data.entity.Reminder"/>
+            type="com.regmoraes.closer.data.database.Reminder"/>
     </data>
 
     <android.support.constraint.ConstraintLayout

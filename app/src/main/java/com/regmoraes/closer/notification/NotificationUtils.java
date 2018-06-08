@@ -12,7 +12,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
 import com.regmoraes.closer.R;
-import com.regmoraes.closer.data.entity.Reminder;
+import com.regmoraes.closer.data.database.Reminder;
 import com.regmoraes.closer.presentation.RemindersActivity;
 import com.regmoraes.closer.services.DoneReminderReceiver;
 
@@ -69,10 +69,10 @@ public class NotificationUtils {
                 // to decode the Bitmap.
                 .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher))
                 .setColor(Color.RED)
-                .setContentTitle(reminder.title)
-                .setContentText(reminder.description)
+                .setContentTitle(reminder.getTitle())
+                .setContentText(reminder.getDescription())
                 .setContentIntent(notificationPendingIntent)
-                .addAction(createDoneAction(context, reminder.getId()))
+                .addAction(createDoneAction(context, reminder.getUid()))
                 .setAutoCancel(true);
 
         // Set the Channel ID for Android O.
@@ -84,7 +84,7 @@ public class NotificationUtils {
         builder.setAutoCancel(true);
 
         // Issue the notification
-        mNotificationManager.notify(reminder.getId(), builder.build());
+        mNotificationManager.notify(reminder.getUid(), builder.build());
     }
 
     private static NotificationCompat.Action createDoneAction(Context context, int reminderId) {

@@ -42,11 +42,15 @@ dependencies {
             playServices.values(),
             rx.values(),
             dagger2.core,
-            timber
+            timber,
+            archComponents.values(),
+            room.runtime,
+            room.rxjava
     )
 
     annotationProcessor (
-            dagger2.compiler
+            dagger2.compiler,
+            room.compiler
     )
 
     testImplementation (

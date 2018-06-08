@@ -5,7 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.regmoraes.closer.CloserApp;
-import com.regmoraes.closer.data.entity.Reminder;
+import com.regmoraes.closer.SchedulerTransformers;
+import com.regmoraes.closer.data.database.Reminder;
 import com.regmoraes.closer.domain.GeofencesManager;
 import com.regmoraes.closer.domain.RemindersManager;
 
@@ -35,8 +36,11 @@ public class DoneReminderReceiver extends BroadcastReceiver {
 
             if(reminderId >= 0) {
 
-                geofencesManager.deleteGeofence(String.valueOf(reminderId));
-                remindersManager.deleteReminder(reminderId);
+                remindersManager.getReminder(reminderId)
+                        .compose(SchedulerTransformers.applySingleBaseScheduler())
+                        .subscribe(
+                                reminder -> geofencesManager.deleteGeofence(String.valueOf(reminderId))
+                        );
             }
         }
     }

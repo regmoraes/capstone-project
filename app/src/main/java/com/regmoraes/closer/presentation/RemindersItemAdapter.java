@@ -1,20 +1,20 @@
 package com.regmoraes.closer.presentation;
 
-import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.regmoraes.closer.data.database.ReminderContract;
-import com.regmoraes.closer.data.entity.Reminder;
-import com.regmoraes.closer.data.entity.ReminderMapper;
+import com.regmoraes.closer.data.database.Reminder;
 import com.regmoraes.closer.databinding.AdapterReminderItemBinding;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RemindersItemAdapter extends RecyclerView.Adapter<RemindersItemAdapter.ViewHolder> {
 
-    private Cursor mCursor = null;
+    private List<Reminder> reminders = new ArrayList<>();
     private AdapterClickListener listener;
 
     public RemindersItemAdapter(AdapterClickListener listener) {
@@ -23,8 +23,7 @@ public class RemindersItemAdapter extends RecyclerView.Adapter<RemindersItemAdap
 
     @Override
     public long getItemId(int position) {
-        mCursor.moveToPosition(position);
-        return mCursor.getLong(ReminderContract.ReminderEntry.Query._ID);
+        return reminders.get(position).getUid();
     }
 
     @NonNull
@@ -41,10 +40,7 @@ public class RemindersItemAdapter extends RecyclerView.Adapter<RemindersItemAdap
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-
-        mCursor.moveToPosition(position);
-
-        holder.bind(mCursor);
+        holder.bind(reminders.get(position));
     }
 
     @Override
@@ -54,7 +50,7 @@ public class RemindersItemAdapter extends RecyclerView.Adapter<RemindersItemAdap
 
     @Override
     public int getItemCount() {
-        return mCursor != null ? mCursor.getCount() : 0;
+        return reminders.size();
     }
 
     interface AdapterClickListener {
@@ -73,9 +69,7 @@ public class RemindersItemAdapter extends RecyclerView.Adapter<RemindersItemAdap
             binding.getRoot().setOnClickListener(this);
         }
 
-        public void bind(Cursor cursor){
-
-            Reminder reminder = ReminderMapper.fromCursor(cursor);
+        public void bind(Reminder reminder){
 
             binding.setReminder(reminder);
             binding.executePendingBindings();
@@ -87,8 +81,8 @@ public class RemindersItemAdapter extends RecyclerView.Adapter<RemindersItemAdap
         }
     }
 
-    public void setData(Cursor newCursor){
-        mCursor = newCursor;
+    public void setData(List<Reminder> reminders){
+        this.reminders = reminders;
         notifyDataSetChanged();
     }
 }

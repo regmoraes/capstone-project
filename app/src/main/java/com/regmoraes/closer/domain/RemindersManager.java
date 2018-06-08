@@ -1,113 +1,65 @@
 package com.regmoraes.closer.domain;
 
-import android.content.ContentResolver;
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
-import android.support.v4.content.CursorLoader;
+import com.regmoraes.closer.SchedulerTransformers;
+import com.regmoraes.closer.data.database.Reminder;
+import com.regmoraes.closer.data.database.RemindersRepository;
 
-import com.regmoraes.closer.data.database.ReminderContract;
-import com.regmoraes.closer.data.entity.Reminder;
+import java.util.List;
 
 import javax.inject.Inject;
+
+import io.reactivex.Flowable;
+import io.reactivex.Single;
 
 /**
  * Copyright {2018} {Rômulo Eduardo G. Moraes}
  **/
 public class RemindersManager {
 
-    private ContentResolver mContentResolver;
+    private RemindersRepository remindersRepository;
+    private GeofencesManager geofencesManager;
 
     @Inject
-    public RemindersManager(ContentResolver contentResolver) {
-        this.mContentResolver = contentResolver;
+    public RemindersManager(RemindersRepository remindersRepository,
+                            GeofencesManager geofencesManager) {
+
+        this.remindersRepository = remindersRepository;
+        this.geofencesManager = geofencesManager;
     }
 
-    public CursorLoader getRemindersCursorLoader(Context context) {
+    public void setUpReminders() {
 
-        Uri remindersUri = ReminderContract.ReminderEntry.CONTENT_URI;
-
-        return new CursorLoader(context, remindersUri, ReminderContract.ReminderEntry.Query.PROJECTION, null,
-                null, null);
-
-//        Cursor cursor = mContentResolver.query(ReminderContract.ReminderEntry.CONTENT_URI,
-//                null, null, null, null);
-//
-//        List<Reminder> reminders = new ArrayList<>();
-//
-//        if(cursor != null && cursor.getCount() > 0) {
-//
-//            cursor.moveToFirst();
-//
-//            while (!cursor.isAfterLast()) {
-//
-//                Reminder reminder = new Reminder(
-//                        cursor.getInt(cursor.getColumnIndex(ReminderContract.ReminderEntry._ID)),
-//                        cursor.getString(cursor.getColumnIndex(ReminderContract.ReminderEntry.COLUMN_NAME_TITLE)),
-//                        cursor.getString(cursor.getColumnIndex(ReminderContract.ReminderEntry.COLUMN_NAME_DESCRIPTION)),
-//                        cursor.getDouble(cursor.getColumnIndex(ReminderContract.ReminderEntry.COLUMN_NAME_LAT)),
-//                        cursor.getDouble(cursor.getColumnIndex(ReminderContract.ReminderEntry.COLUMN_NAME_LNG))
-//                );
-//
-//                reminders.add(reminder);
-//                cursor.moveToNext();
-//            }
-//
-//            cursor.close();
-//        }
-//
-//        return cursor;
+        getReminders()
+                .compose(SchedulerTransformers.applyFlowableBaseScheduler())
+                .firstOrError()
+                .filter(reminders -> !reminders.isEmpty())
+                .subscribe(
+                        reminders -> geofencesManager.createGeofenceForReminders(reminders),
+                        error -> {}
+                );
     }
 
-    public Cursor getReminder(int reminderId) {
-
-        final Uri uri = ReminderContract.ReminderEntry.CONTENT_URI
-                .buildUpon().appendPath(String.valueOf(reminderId)).build();
-
-        return mContentResolver.query(uri,
-                ReminderContract.ReminderEntry.Query.PROJECTION,
-                null, null, null);
+    public Flowable<List<Reminder>> getReminders() {
+        return remindersRepository.getReminders();
     }
 
-    public int insertReminder(Reminder reminder) {
-
-        final ContentValues mValues = new ContentValues();
-        mValues.put(ReminderContract.ReminderEntry.COLUMN_NAME_TITLE, reminder.getTitle());
-        mValues.put(ReminderContract.ReminderEntry.COLUMN_NAME_DESCRIPTION, reminder.getDescription());
-        mValues.put(ReminderContract.ReminderEntry.COLUMN_LOCATION_NAME, reminder.getLocationName());
-        mValues.put(ReminderContract.ReminderEntry.COLUMN_NAME_LAT, reminder.getLat());
-        mValues.put(ReminderContract.ReminderEntry.COLUMN_NAME_LNG, reminder.getLng());
-
-        Uri mUri = mContentResolver.insert(ReminderContract.ReminderEntry.CONTENT_URI, mValues);
-
-        if(mUri != null) {
-            return Integer.valueOf(mUri.getLastPathSegment());
-        } else {
-            return -1;
-        }
+    public Single<Reminder> getReminder(int uid) {
+        return remindersRepository.getReminderById(uid);
     }
 
-    public int updateReminder(Reminder reminder) {
+    public void insertReminder(Reminder reminder) {
 
-        final ContentValues mValues = new ContentValues();
-        mValues.put(ReminderContract.ReminderEntry.COLUMN_NAME_TITLE, reminder.getTitle());
-        mValues.put(ReminderContract.ReminderEntry.COLUMN_NAME_DESCRIPTION, reminder.getDescription());
-        mValues.put(ReminderContract.ReminderEntry.COLUMN_LOCATION_NAME, reminder.getLocationName());
-        mValues.put(ReminderContract.ReminderEntry.COLUMN_NAME_LAT, reminder.getLat());
-        mValues.put(ReminderContract.ReminderEntry.COLUMN_NAME_LNG, reminder.getLng());
-
-        Uri mUri = ReminderContract.ReminderEntry.CONTENT_URI
-                .buildUpon().appendPath(String.valueOf(reminder.getId())).build();
-
-        return mContentResolver.update(mUri, mValues, null, null);
+        Single.fromCallable(() -> remindersRepository.insert(reminder))
+                .flatMap( reminderId -> remindersRepository.getReminderById(reminderId) )
+                .compose(SchedulerTransformers.applySingleBaseScheduler())
+                .subscribe(newReminder -> geofencesManager.createGeofenceForReminder(newReminder));
     }
 
-    public int deleteReminder(Integer reminderId) {
+    public void updateReminder(Reminder reminder) {
+        remindersRepository.insert(reminder);
+    }
 
-        final Uri uri = ReminderContract.ReminderEntry.CONTENT_URI
-                .buildUpon().appendPath(String.valueOf(reminderId)).build();
-
-        return mContentResolver.delete(uri, null, null);
+    public void deleteReminder(Reminder reminder) {
+        remindersRepository.delete(reminder);
     }
 }

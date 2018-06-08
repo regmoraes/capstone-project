@@ -1,18 +1,14 @@
 package com.regmoraes.closer.presentation;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 
 import com.regmoraes.closer.CloserApp;
 import com.regmoraes.closer.R;
+import com.regmoraes.closer.SchedulerTransformers;
 import com.regmoraes.closer.databinding.ActivityRemindersBinding;
 import com.regmoraes.closer.domain.GeofencesManager;
 import com.regmoraes.closer.domain.RemindersManager;
@@ -21,8 +17,8 @@ import javax.inject.Inject;
 
 import static android.support.v7.widget.LinearLayoutManager.HORIZONTAL;
 
-public class RemindersActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<Cursor>,RemindersItemAdapter.AdapterClickListener {
+public class RemindersActivity extends AppCompatActivity implements
+        RemindersItemAdapter.AdapterClickListener {
 
     private ActivityRemindersBinding viewBinding;
     private RemindersItemAdapter remindersItemAdapter;
@@ -41,7 +37,7 @@ public class RemindersActivity extends AppCompatActivity
 
         setUpView();
 
-        setUpGeofences();
+        remindersManager.setUpReminders();
 
         loadData();
     }
@@ -78,28 +74,12 @@ public class RemindersActivity extends AppCompatActivity
     }
 
     private void loadData() {
-        getSupportLoaderManager().initLoader(0, null, this);
+
+        remindersManager.getReminders()
+                .compose(SchedulerTransformers.applyFlowableBaseScheduler())
+                .subscribe( reminders -> remindersItemAdapter.setData(reminders) );
     }
 
-    @NonNull
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
-        return remindersManager.getRemindersCursorLoader(this);
-    }
-
-    @Override
-    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
-        remindersItemAdapter.setData(cursor);
-    }
-
-    @Override
-    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-        remindersItemAdapter.setData(null);
-    }
-
-    private void setUpGeofences() {
-        geofencesManager.setUpGeofences();
-    }
 
     @Override
     public void onReminderClicked(long reminderId) {

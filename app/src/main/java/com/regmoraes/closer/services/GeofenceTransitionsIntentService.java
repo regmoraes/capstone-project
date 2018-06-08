@@ -2,13 +2,11 @@ package com.regmoraes.closer.services;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.database.Cursor;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 import com.regmoraes.closer.CloserApp;
-import com.regmoraes.closer.data.entity.Reminder;
-import com.regmoraes.closer.data.entity.ReminderMapper;
+import com.regmoraes.closer.SchedulerTransformers;
 import com.regmoraes.closer.domain.RemindersManager;
 import com.regmoraes.closer.notification.NotificationUtils;
 
@@ -62,30 +60,17 @@ public class GeofenceTransitionsIntentService extends IntentService {
             Timber.d("Geofences: %s", triggeringGeofences.toString());
 
             // Send notification and log the transition details.
-            for(Geofence geofence: triggeringGeofences) {
+            for (Geofence geofence : triggeringGeofences) {
 
-                Cursor cursor = remindersManager.getReminder(Integer.valueOf(geofence.getRequestId()));
+                remindersManager.getReminder(Integer.valueOf(geofence.getRequestId()))
+                        .compose(SchedulerTransformers.applySingleBaseScheduler())
+                        .subscribe( reminder -> {
 
-                if(cursor != null) {
 
-                    cursor.moveToFirst();
-
-                    while(!cursor.isAfterLast()) {
-
-                        Reminder reminder = ReminderMapper.fromCursor(cursor);
-
-                        NotificationUtils
-                                .sendNotificationForReminder(getApplicationContext(), reminder);
-
-                        cursor.moveToNext();
-                    }
-
-                    cursor.close();
-                }
+                            NotificationUtils
+                                    .sendNotificationForReminder(getApplicationContext(), reminder);
+                        });
             }
-
-        } else {
-            // Log the error.
         }
     }
 }

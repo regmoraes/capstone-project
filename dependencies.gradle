@@ -13,6 +13,18 @@ ext {
             recyclerView: "com.android.support:recyclerview-v7:$supportLibraries_version"
     ]
 
+    def lifecycle_version = "1.1.1"
+    archComponents = [
+            extensions: "android.arch.lifecycle:extensions:$lifecycle_version"
+    ]
+
+    def room_version = "1.1.0"
+    room = [
+            runtime: "android.arch.persistence.room:runtime:$room_version",
+            rxjava: "android.arch.persistence.room:rxjava2:$room_version",
+            compiler: "android.arch.persistence.room:compiler:$room_version"
+    ]
+
     def timber_version = '4.7.0'
     timber = [ "com.jakewharton.timber:timber:$timber_version" ]
 
