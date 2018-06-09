@@ -6,7 +6,7 @@ import android.content.Intent;
 
 import com.regmoraes.closer.CloserApp;
 import com.regmoraes.closer.SchedulerTransformers;
-import com.regmoraes.closer.data.database.Reminder;
+import com.regmoraes.closer.data.Reminder;
 import com.regmoraes.closer.domain.GeofencesManager;
 import com.regmoraes.closer.domain.RemindersManager;
 

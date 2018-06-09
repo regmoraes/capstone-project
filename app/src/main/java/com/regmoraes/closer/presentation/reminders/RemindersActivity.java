@@ -1,5 +1,6 @@
-package com.regmoraes.closer.presentation;
+package com.regmoraes.closer.presentation.reminders;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -8,25 +9,25 @@ import android.support.v7.widget.DividerItemDecoration;
 
 import com.regmoraes.closer.CloserApp;
 import com.regmoraes.closer.R;
-import com.regmoraes.closer.SchedulerTransformers;
+import com.regmoraes.closer.data.Reminder;
 import com.regmoraes.closer.databinding.ActivityRemindersBinding;
-import com.regmoraes.closer.domain.GeofencesManager;
-import com.regmoraes.closer.domain.RemindersManager;
+import com.regmoraes.closer.presentation.addreminder.AddReminderActivity;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
 import static android.support.v7.widget.LinearLayoutManager.HORIZONTAL;
 
 public class RemindersActivity extends AppCompatActivity implements
-        RemindersItemAdapter.AdapterClickListener {
+        RemindersItemAdapter.AdapterClickListener, RemindersViewModel.Observer {
 
     private ActivityRemindersBinding viewBinding;
+    private RemindersViewModel viewModel;
     private RemindersItemAdapter remindersItemAdapter;
 
     @Inject
-    public RemindersManager remindersManager;
-    @Inject
-    public GeofencesManager geofencesManager;
+    public RemindersViewModelFactory viewModelFactory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,9 +38,7 @@ public class RemindersActivity extends AppCompatActivity implements
 
         setUpView();
 
-        remindersManager.setUpReminders();
-
-        loadData();
+        setUpViewModel();
     }
 
     private void setUpInjections() {
@@ -73,13 +72,20 @@ public class RemindersActivity extends AppCompatActivity implements
         viewBinding.recyclerViewReminders.setAdapter(remindersItemAdapter);
     }
 
-    private void loadData() {
+    void setUpViewModel() {
 
-        remindersManager.getReminders()
-                .compose(SchedulerTransformers.applyFlowableBaseScheduler())
-                .subscribe( reminders -> remindersItemAdapter.setData(reminders) );
+        viewModel = ViewModelProviders.of(this, viewModelFactory)
+                .get(RemindersViewModel.class);
+
+        viewModel.getReminders().observe(this, this::handleReminders);
+
+        viewModel.loadReminders();
     }
 
+    @Override
+    public void handleReminders(List<Reminder> reminders) {
+        remindersItemAdapter.setData(reminders);
+    }
 
     @Override
     public void onReminderClicked(long reminderId) {

@@ -3,8 +3,8 @@ package com.regmoraes.closer.di;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 
-import com.regmoraes.closer.data.database.CloserDatabase;
-import com.regmoraes.closer.data.database.RemindersRepository;
+import com.regmoraes.closer.data.CloserDatabase;
+import com.regmoraes.closer.data.RemindersRepository;
 
 import javax.inject.Singleton;
 

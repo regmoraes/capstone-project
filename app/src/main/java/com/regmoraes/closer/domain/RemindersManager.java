@@ -1,13 +1,15 @@
 package com.regmoraes.closer.domain;
 
 import com.regmoraes.closer.SchedulerTransformers;
-import com.regmoraes.closer.data.database.Reminder;
-import com.regmoraes.closer.data.database.RemindersRepository;
+import com.regmoraes.closer.data.Reminder;
+import com.regmoraes.closer.data.RemindersRepository;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 
@@ -47,12 +49,13 @@ public class RemindersManager {
         return remindersRepository.getReminderById(uid);
     }
 
-    public void insertReminder(Reminder reminder) {
+    public Completable insertReminder(Reminder reminder) {
 
-        Single.fromCallable(() -> remindersRepository.insert(reminder))
-                .flatMap( reminderId -> remindersRepository.getReminderById(reminderId) )
-                .compose(SchedulerTransformers.applySingleBaseScheduler())
-                .subscribe(newReminder -> geofencesManager.createGeofenceForReminder(newReminder));
+        return Single.fromCallable(() -> remindersRepository.insert(reminder))
+                .flatMap(reminderId -> remindersRepository.getReminderById(reminderId))
+                .flatMapCompletable(newReminder ->
+                        Completable.fromAction(() -> geofencesManager.createGeofenceForReminder(newReminder))
+                );
     }
 
     public void updateReminder(Reminder reminder) {

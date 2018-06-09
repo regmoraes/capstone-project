@@ -1,7 +1,7 @@
 package com.regmoraes.closer.di;
 
-import com.regmoraes.closer.presentation.AddReminderActivity;
-import com.regmoraes.closer.presentation.RemindersActivity;
+import com.regmoraes.closer.presentation.addreminder.AddReminderActivity;
+import com.regmoraes.closer.presentation.reminders.RemindersActivity;
 import com.regmoraes.closer.services.DoneReminderReceiver;
 import com.regmoraes.closer.services.GeofenceTransitionsIntentService;
 

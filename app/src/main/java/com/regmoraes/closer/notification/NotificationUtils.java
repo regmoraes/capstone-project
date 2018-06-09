@@ -12,8 +12,8 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
 import com.regmoraes.closer.R;
-import com.regmoraes.closer.data.database.Reminder;
-import com.regmoraes.closer.presentation.RemindersActivity;
+import com.regmoraes.closer.data.Reminder;
+import com.regmoraes.closer.presentation.reminders.RemindersActivity;
 import com.regmoraes.closer.services.DoneReminderReceiver;
 
 /**

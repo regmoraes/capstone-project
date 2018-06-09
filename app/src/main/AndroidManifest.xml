@@ -18,7 +18,7 @@
         <receiver android:name=".services.DoneReminderReceiver"/>
 
         <activity
-            android:name=".presentation.RemindersActivity"
+            android:name=".presentation.reminders.RemindersActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".presentation.AddReminderActivity"/>
+        <activity android:name=".presentation.addreminder.AddReminderActivity"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

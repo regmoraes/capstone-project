@@ -1,4 +1,4 @@
-package com.regmoraes.closer.data.database;
+package com.regmoraes.closer.data;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;

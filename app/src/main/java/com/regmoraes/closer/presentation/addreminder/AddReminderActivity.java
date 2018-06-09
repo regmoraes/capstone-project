@@ -1,5 +1,6 @@
-package com.regmoraes.closer.presentation;
+package com.regmoraes.closer.presentation.addreminder;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -14,24 +15,20 @@ import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.regmoraes.closer.CloserApp;
 import com.regmoraes.closer.R;
-import com.regmoraes.closer.data.database.Reminder;
 import com.regmoraes.closer.databinding.ActivityAddReminderBinding;
-import com.regmoraes.closer.domain.GeofencesManager;
-import com.regmoraes.closer.domain.RemindersManager;
 
 import javax.inject.Inject;
 
-public class AddReminderActivity extends AppCompatActivity {
+public class AddReminderActivity extends AppCompatActivity implements AddReminderViewModel.Observer {
 
-    private ActivityAddReminderBinding viewBinding;
-    private Reminder reminder = new Reminder();
     private int PLACE_REQUEST_CODE = 101;
 
-    @Inject
-    public RemindersManager remindersManager;
+    private ActivityAddReminderBinding viewBinding;
+    private AddReminderViewModel viewModel;
+    private ReminderData reminderData;
 
     @Inject
-    public GeofencesManager geofencesManager;
+    public AddReminderViewModelFactory viewModelFactory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +38,8 @@ public class AddReminderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setUpView();
+
+        setUpViewModel();
     }
 
     private void setUpInjections() {
@@ -56,13 +55,23 @@ public class AddReminderActivity extends AppCompatActivity {
 
         viewBinding.buttonConfirm.setOnClickListener(onConfirmReminderClickListener);
         viewBinding.editTextPlace.setOnClickListener(onEditPlaceClickListener);
+
+        reminderData = new ReminderData();
+    }
+
+    private void setUpViewModel() {
+
+        viewModel = ViewModelProviders.of(this, viewModelFactory)
+                .get(AddReminderViewModel.class);
+
+        viewModel.getReminderAddedEvent().observe(this, this::handleReminderAddedEvent);
     }
 
     private void fillReminderAttributes() {
 
-        reminder.setTitle(viewBinding.editTextTitle.getText().toString());
-        reminder.setDescription(viewBinding.editTextDescription.getText().toString());
-        reminder.setLocationName(viewBinding.editTextPlace.getText().toString());
+        reminderData.setTitle(viewBinding.editTextTitle.getText().toString());
+        reminderData.setDescription(viewBinding.editTextDescription.getText().toString());
+        reminderData.setLocationName(viewBinding.editTextPlace.getText().toString());
     }
 
     private boolean isReminderFieldsFilled() {
@@ -97,9 +106,9 @@ public class AddReminderActivity extends AppCompatActivity {
                 Place place = PlaceAutocomplete.getPlace(this, data);
                 String placeName = place.getName().toString();
 
-                reminder.setLocationName(placeName);
-                reminder.setLatitude(place.getLatLng().latitude);
-                reminder.setLongitude(place.getLatLng().longitude);
+                reminderData.setLocationName(placeName);
+                reminderData.setLatitude(place.getLatLng().latitude);
+                reminderData.setLongitude(place.getLatLng().longitude);
 
                 viewBinding.editTextPlace.setText(placeName);
 
@@ -116,7 +125,7 @@ public class AddReminderActivity extends AppCompatActivity {
 
             fillReminderAttributes();
 
-            remindersManager.insertReminder(reminder);
+            viewModel.insertReminder(reminderData);
         }
     };
 
@@ -135,4 +144,9 @@ public class AddReminderActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     };
+
+    @Override
+    public void handleReminderAddedEvent(Void aVoid) {
+        finish();
+    }
 }

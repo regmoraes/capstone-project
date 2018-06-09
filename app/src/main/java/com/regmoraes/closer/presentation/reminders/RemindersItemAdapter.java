@@ -1,4 +1,4 @@
-package com.regmoraes.closer.presentation;
+package com.regmoraes.closer.presentation.reminders;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.regmoraes.closer.data.database.Reminder;
+import com.regmoraes.closer.data.Reminder;
 import com.regmoraes.closer.databinding.AdapterReminderItemBinding;
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ public class RemindersItemAdapter extends RecyclerView.Adapter<RemindersItemAdap
     private List<Reminder> reminders = new ArrayList<>();
     private AdapterClickListener listener;
 
-    public RemindersItemAdapter(AdapterClickListener listener) {
+    RemindersItemAdapter(AdapterClickListener listener) {
         this.listener = listener;
     }
 
