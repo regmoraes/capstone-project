@@ -13,6 +13,8 @@ import android.support.v4.app.TaskStackBuilder;
 
 import com.regmoraes.closer.R;
 import com.regmoraes.closer.data.Reminder;
+import com.regmoraes.closer.presentation.addreminder.ReminderData;
+import com.regmoraes.closer.presentation.reminderdetail.ReminderDetailActivity;
 import com.regmoraes.closer.presentation.reminders.RemindersActivity;
 import com.regmoraes.closer.services.DoneReminderReceiver;
 
@@ -23,11 +25,7 @@ public class NotificationUtils {
 
     private static final String CHANNEL_ID = "reminder-channel";
 
-    /**
-     * Posts a notification in the notification bar when a transition is detected.
-     * If the user clicks the notification, control goes to the MainActivity.
-     */
-    public static void sendNotificationForReminder(Context context, Reminder reminder) {
+    public static void sendNotificationForReminder(Context context, ReminderData reminder) {
 
         NotificationManager mNotificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -44,34 +42,18 @@ public class NotificationUtils {
             mNotificationManager.createNotificationChannel(mChannel);
         }
 
-        // Create an explicit content Intent that starts the main Activity.
-        Intent notificationIntent = new Intent(context.getApplicationContext(), RemindersActivity.class);
+        PendingIntent reminderDetailPendingIntent =
+                createTaskStack(context, createReminderDetailIntent(context, reminder))
+                        .getPendingIntent(reminder.getUid(), PendingIntent.FLAG_UPDATE_CURRENT);
 
-        // Construct a task stack.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-
-        // Add the main Activity to the task stack as the parent.
-        stackBuilder.addParentStack(RemindersActivity.class);
-
-        // Push the content Intent onto the stack.
-        stackBuilder.addNextIntent(notificationIntent);
-
-        // Get a PendingIntent containing the entire back stack.
-        PendingIntent notificationPendingIntent =
-                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        // Get a notification builder that's compatible with platform versions >= 4
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID);
 
-        // Define the notification settings.
         builder.setSmallIcon(R.mipmap.ic_launcher)
-                // In a real app, you may want to use a library like Volley
-                // to decode the Bitmap.
                 .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher))
                 .setColor(Color.RED)
                 .setContentTitle(reminder.getTitle())
                 .setContentText(reminder.getDescription())
-                .setContentIntent(notificationPendingIntent)
+                .setContentIntent(reminderDetailPendingIntent)
                 .addAction(createDoneAction(context, reminder.getUid()))
                 .setAutoCancel(true);
 
@@ -80,22 +62,37 @@ public class NotificationUtils {
             builder.setChannelId(CHANNEL_ID); // Channel ID
         }
 
-        // Dismiss notification once the user touches it.
-        builder.setAutoCancel(true);
-
         // Issue the notification
         mNotificationManager.notify(reminder.getUid(), builder.build());
     }
 
     private static NotificationCompat.Action createDoneAction(Context context, int reminderId) {
 
-        Intent snoozeIntent = new Intent(context, DoneReminderReceiver.class);
-        snoozeIntent.setAction(DoneReminderReceiver.ACTION_DONE);
-        snoozeIntent.putExtra(Reminder.REMINDER_ID, reminderId);
+        Intent doneIntent = new Intent(context, DoneReminderReceiver.class);
+        doneIntent.setAction(DoneReminderReceiver.ACTION_DONE);
+        doneIntent.putExtra(Reminder.REMINDER_ID, reminderId);
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, reminderId,
-                snoozeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                doneIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         return new NotificationCompat.Action(R.mipmap.ic_launcher, "DONE", pendingIntent);
+    }
+
+    private static Intent createReminderDetailIntent(Context context, ReminderData reminder) {
+
+        Intent intent = new Intent(context.getApplicationContext(), ReminderDetailActivity.class);
+        intent.putExtra(ReminderData.class.getSimpleName(), reminder);
+
+        return intent;
+    }
+
+    private static TaskStackBuilder createTaskStack(Context context, Intent nextIntent) {
+
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+
+        stackBuilder.addParentStack(RemindersActivity.class);
+        stackBuilder.addNextIntent(nextIntent);
+
+        return stackBuilder;
     }
 }

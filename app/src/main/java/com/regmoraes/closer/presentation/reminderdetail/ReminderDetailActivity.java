@@ -7,9 +7,12 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.regmoraes.closer.CloserApp;
@@ -23,7 +26,6 @@ public class ReminderDetailActivity extends AppCompatActivity implements OnMapRe
 
     private ActivityReminderDetailBinding viewBinding;
     private ReminderDetailViewModel viewModel;
-    private MapFragment mapFragment;
     private ReminderData reminderData;
 
     @Inject
@@ -52,22 +54,30 @@ public class ReminderDetailActivity extends AppCompatActivity implements OnMapRe
 
         viewBinding = DataBindingUtil.setContentView(this, R.layout.activity_reminder_detail);
 
+        viewBinding.fabNavigate.setOnClickListener(onNavigateClickListener);
+
         setSupportActionBar(viewBinding.appBar.toolbar);
 
-        viewBinding.fabNavigate.setOnClickListener(onNavigateClickListener);
+        loadReminderDetail();
+
+        setUpMap();
+    }
+
+    private void loadReminderDetail() {
 
         String reminderDataExtra = ReminderData.class.getSimpleName();
 
         if(getIntent().hasExtra(reminderDataExtra)) {
             reminderData = getIntent().getParcelableExtra(reminderDataExtra);
         }
-
-        setUpMap();
     }
 
     private void setUpMap() {
 
-        MapFragment mapFragment = MapFragment.newInstance();
+        GoogleMapOptions options = new GoogleMapOptions()
+                .mapToolbarEnabled(false);
+
+        MapFragment mapFragment = MapFragment.newInstance(options);
 
         getFragmentManager()
                 .beginTransaction()
@@ -80,15 +90,25 @@ public class ReminderDetailActivity extends AppCompatActivity implements OnMapRe
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
-        googleMap.addMarker(new MarkerOptions()
-                .position(new LatLng(reminderData.getLatitude(), reminderData.getLongitude()))
-                .title(reminderData.getTitle()));
+        LatLng position = new LatLng(reminderData.getLatitude(), reminderData.getLongitude());
+
+        googleMap.addMarker(new MarkerOptions().position(position).title(reminderData.getTitle()));
+
+        CameraPosition cameraPosition = new CameraPosition.Builder().target(position)
+                .zoom(17).build();
+
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
     private View.OnClickListener onNavigateClickListener = __->  {
 
-        Intent mapsItent = new Intent(android.content.Intent.ACTION_VIEW,
-                Uri.parse("https://www.google.com/maps/dir/?api=1&daddr=20.5666,45.345"));
-        startActivity(mapsItent);
+        Uri uri = Uri.parse("https://www.google.com/maps/dir/")
+                .buildUpon()
+                .appendQueryParameter("api","1")
+                .appendQueryParameter("destination",reminderData.getLocationName())
+                .build();
+
+        Intent navigationIntent = new Intent(android.content.Intent.ACTION_VIEW, uri);
+        startActivity(navigationIntent);
     };
 }

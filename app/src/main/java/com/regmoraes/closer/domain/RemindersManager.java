@@ -5,7 +5,6 @@ import com.regmoraes.closer.data.Reminder;
 import com.regmoraes.closer.data.RemindersRepository;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 
@@ -29,15 +28,16 @@ public class RemindersManager {
         this.geofencesManager = geofencesManager;
     }
 
-    public void setUpReminders() {
+    public Completable setUpReminders() {
 
-        getReminders()
+        return getReminders()
                 .compose(SchedulerTransformers.applyFlowableBaseScheduler())
                 .firstOrError()
                 .filter(reminders -> !reminders.isEmpty())
-                .subscribe(
-                        reminders -> geofencesManager.createGeofenceForReminders(reminders),
-                        error -> {}
+                .flatMapCompletable(reminders ->
+                        Completable.fromAction(() ->
+                                geofencesManager.createGeofenceForReminders(reminders)
+                        )
                 );
     }
 
@@ -63,6 +63,9 @@ public class RemindersManager {
     }
 
     public void deleteReminder(Reminder reminder) {
+
         remindersRepository.delete(reminder);
+
+        geofencesManager.deleteGeofence(reminder.getUid().toString());
     }
 }

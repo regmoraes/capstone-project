@@ -9,6 +9,7 @@ import com.regmoraes.closer.CloserApp;
 import com.regmoraes.closer.SchedulerTransformers;
 import com.regmoraes.closer.domain.RemindersManager;
 import com.regmoraes.closer.notification.NotificationUtils;
+import com.regmoraes.closer.presentation.addreminder.ReminderData;
 
 import java.util.List;
 
@@ -45,31 +46,23 @@ public class GeofenceTransitionsIntentService extends IntentService {
             return;
         }
 
-        // Get the transition type.
         int geofenceTransition = geofencingEvent.getGeofenceTransition();
 
-        // Test that the reported transition was of interest.
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER ||
                 geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
 
-            // Get the geofences that were triggered. A single event can trigger
-            // multiple geofences.
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
 
-            // Get the transition details as a String.
             Timber.d("Geofences: %s", triggeringGeofences.toString());
 
-            // Send notification and log the transition details.
             for (Geofence geofence : triggeringGeofences) {
 
                 remindersManager.getReminder(Integer.valueOf(geofence.getRequestId()))
                         .compose(SchedulerTransformers.applySingleBaseScheduler())
-                        .subscribe( reminder -> {
-
-
-                            NotificationUtils
-                                    .sendNotificationForReminder(getApplicationContext(), reminder);
-                        });
+                        .subscribe( reminder -> NotificationUtils
+                                .sendNotificationForReminder(getApplicationContext(),
+                                        ReminderData.fromReminder(reminder))
+                        );
             }
         }
     }

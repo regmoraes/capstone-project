@@ -22,13 +22,11 @@ public class DoneReminderReceiver extends BroadcastReceiver {
     @Inject
     public RemindersManager remindersManager;
 
-    @Inject
-    public GeofencesManager geofencesManager;
-
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        ((CloserApp) context.getApplicationContext()).getComponentsInjector().inject(this);
+        ((CloserApp) context.getApplicationContext())
+                .getComponentsInjector().inject(this);
 
         if (intent.getAction() != null && intent.getAction().equals(ACTION_DONE)) {
 
@@ -39,9 +37,11 @@ public class DoneReminderReceiver extends BroadcastReceiver {
                 remindersManager.getReminder(reminderId)
                         .compose(SchedulerTransformers.applySingleBaseScheduler())
                         .subscribe(
-                                reminder -> geofencesManager.deleteGeofence(String.valueOf(reminderId))
+                                reminder -> remindersManager.deleteReminder(reminder)
                         );
             }
         }
     }
+
+
 }
