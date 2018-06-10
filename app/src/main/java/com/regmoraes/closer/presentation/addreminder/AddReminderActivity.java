@@ -44,14 +44,16 @@ public class AddReminderActivity extends AppCompatActivity implements AddReminde
 
     private void setUpInjections() {
 
-        ((CloserApp) getApplication()).getComponentsInjector().inject(this);
+        ((CloserApp) getApplication()).getComponentsInjector()
+                .presentationComponent()
+                .inject(this);
     }
 
     private void setUpView() {
 
         viewBinding = DataBindingUtil.setContentView(this, R.layout.activity_add_reminder);
 
-        setSupportActionBar(viewBinding.included.toolbar);
+        setSupportActionBar(viewBinding.appBar.toolbar);
 
         viewBinding.buttonConfirm.setOnClickListener(onConfirmReminderClickListener);
         viewBinding.editTextPlace.setOnClickListener(onEditPlaceClickListener);

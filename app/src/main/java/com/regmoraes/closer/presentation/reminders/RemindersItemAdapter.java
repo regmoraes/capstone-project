@@ -54,7 +54,7 @@ public class RemindersItemAdapter extends RecyclerView.Adapter<RemindersItemAdap
     }
 
     interface AdapterClickListener {
-        void onReminderClicked(long reminderId);
+        void onReminderClicked(Reminder reminder);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -77,7 +77,7 @@ public class RemindersItemAdapter extends RecyclerView.Adapter<RemindersItemAdap
 
         @Override
         public void onClick(View v) {
-            listener.onReminderClicked(getItemId());
+            listener.onReminderClicked(reminders.get(getAdapterPosition()));
         }
     }
 

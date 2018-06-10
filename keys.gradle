@@ -1,5 +1,0 @@
-ext {
-
-    def places_api_key_default = 'AIzaSyA0eWIQzgLXeeqDt7aDIZsdZ-e-pjxUpSw'
-    placesApiKey = [ default: "AIzaSyA0eWIQzgLXeeqDt7aDIZsdZ-e-pjxUpSw" ]
-}

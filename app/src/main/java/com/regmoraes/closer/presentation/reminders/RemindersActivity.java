@@ -12,6 +12,8 @@ import com.regmoraes.closer.R;
 import com.regmoraes.closer.data.Reminder;
 import com.regmoraes.closer.databinding.ActivityRemindersBinding;
 import com.regmoraes.closer.presentation.addreminder.AddReminderActivity;
+import com.regmoraes.closer.presentation.addreminder.ReminderData;
+import com.regmoraes.closer.presentation.reminderdetail.ReminderDetailActivity;
 
 import java.util.List;
 
@@ -43,7 +45,9 @@ public class RemindersActivity extends AppCompatActivity implements
 
     private void setUpInjections() {
 
-        ((CloserApp) getApplication()).getComponentsInjector().inject(this);
+        ((CloserApp) getApplication()).getComponentsInjector()
+                .presentationComponent()
+                .inject(this);
     }
 
     private void setUpView() {
@@ -58,7 +62,7 @@ public class RemindersActivity extends AppCompatActivity implements
             startActivity(addReminder);
         });
 
-        setSupportActionBar(viewBinding.included.toolbar);
+        setSupportActionBar(viewBinding.appBar.toolbar);
 
         DividerItemDecoration divider =
                 new DividerItemDecoration(
@@ -88,7 +92,12 @@ public class RemindersActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onReminderClicked(long reminderId) {
+    public void onReminderClicked(Reminder reminder) {
 
+        Intent reminderDetail = new Intent(this, ReminderDetailActivity.class);
+        reminderDetail.putExtra(ReminderData.class.getSimpleName(),
+                ReminderData.fromReminder(reminder));
+
+        startActivity(reminderDetail);
     }
 }
