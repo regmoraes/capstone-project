@@ -5,6 +5,8 @@ import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -14,19 +16,26 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.regmoraes.closer.CloserApp;
 import com.regmoraes.closer.R;
 import com.regmoraes.closer.databinding.ActivityReminderDetailBinding;
+import com.regmoraes.closer.presentation.addreminder.AddReminderActivity;
 import com.regmoraes.closer.presentation.addreminder.ReminderData;
 
 import javax.inject.Inject;
 
 public class ReminderDetailActivity extends AppCompatActivity implements OnMapReadyCallback {
 
+    public static int EDIT_REMINDER_REQ_CODE = 100;
+
     private ActivityReminderDetailBinding viewBinding;
     private ReminderDetailViewModel viewModel;
-    private ReminderData reminderData;
+
+    private GoogleMap map;
+    private Marker reminderMarker;
+    private ReminderData reminderData = null;
 
     @Inject
     public ReminderDetailViewModelFactory viewModelFactory;
@@ -57,19 +66,12 @@ public class ReminderDetailActivity extends AppCompatActivity implements OnMapRe
         viewBinding.fabNavigate.setOnClickListener(onNavigateClickListener);
 
         setSupportActionBar(viewBinding.appBar.toolbar);
-
-        loadReminderDetail();
+        if(getSupportActionBar() != null) {
+            getSupportActionBar().setHomeButtonEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
 
         setUpMap();
-    }
-
-    private void loadReminderDetail() {
-
-        String reminderDataExtra = ReminderData.class.getSimpleName();
-
-        if(getIntent().hasExtra(reminderDataExtra)) {
-            reminderData = getIntent().getParcelableExtra(reminderDataExtra);
-        }
     }
 
     private void setUpMap() {
@@ -90,14 +92,71 @@ public class ReminderDetailActivity extends AppCompatActivity implements OnMapRe
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
-        LatLng position = new LatLng(reminderData.getLatitude(), reminderData.getLongitude());
+        map = googleMap;
 
-        googleMap.addMarker(new MarkerOptions().position(position).title(reminderData.getTitle()));
+        loadReminderDetail(null);
+    }
 
-        CameraPosition cameraPosition = new CameraPosition.Builder().target(position)
-                .zoom(17).build();
+    private void loadReminderDetail(ReminderData reminderData) {
 
-        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        if(reminderData == null) {
+
+            String reminderDataExtra = ReminderData.class.getSimpleName();
+
+            if (getIntent().hasExtra(reminderDataExtra)) {
+                reminderData = getIntent().getParcelableExtra(reminderDataExtra);
+                this.reminderData = reminderData;
+            } else {
+                return;
+            }
+
+        } else {
+
+            if(reminderMarker != null) {
+                reminderMarker.remove();
+            }
+        }
+
+        if(getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(reminderData.getTitle());
+            getSupportActionBar().setSubtitle(reminderData.getLocationName());
+        }
+
+        if(map != null) {
+
+            LatLng position = new LatLng(reminderData.getLatitude(), reminderData.getLongitude());
+
+            reminderMarker = map.addMarker(new MarkerOptions().position(position)
+                    .title(reminderData.getTitle()));
+
+            reminderMarker.showInfoWindow();
+
+            CameraPosition cameraPosition = new CameraPosition.Builder().target(position)
+                    .zoom(17).build();
+
+            map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_reminder_detail, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if(item.getItemId() == R.id.action_edit) {
+
+            Intent editIntent = new Intent(this, AddReminderActivity.class);
+            editIntent.putExtra(ReminderData.class.getSimpleName(), reminderData);
+            startActivityForResult(editIntent, EDIT_REMINDER_REQ_CODE);
+
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private View.OnClickListener onNavigateClickListener = __->  {
@@ -111,4 +170,20 @@ public class ReminderDetailActivity extends AppCompatActivity implements OnMapRe
         Intent navigationIntent = new Intent(android.content.Intent.ACTION_VIEW, uri);
         startActivity(navigationIntent);
     };
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if(requestCode == EDIT_REMINDER_REQ_CODE && resultCode == RESULT_OK) {
+
+            final String reminderDataExtra = ReminderData.class.getSimpleName();
+
+            if(data != null && data.hasExtra(reminderDataExtra)) {
+                loadReminderDetail(data.getParcelableExtra(reminderDataExtra));
+            }
+
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
 }

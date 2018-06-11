@@ -3,8 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.regmoraes.closer.presentation.reminders.RemindersActivity">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_edit"
         android:orderInCategory="100"
         android:title="Edit"
+        android:icon="@drawable/ic_edit"
         app:showAsAction="never" />
 </menu>

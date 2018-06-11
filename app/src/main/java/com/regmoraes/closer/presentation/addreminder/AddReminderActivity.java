@@ -40,6 +40,8 @@ public class AddReminderActivity extends AppCompatActivity implements AddReminde
         setUpView();
 
         setUpViewModel();
+
+        loadReminderData();
     }
 
     private void setUpInjections() {
@@ -57,8 +59,6 @@ public class AddReminderActivity extends AppCompatActivity implements AddReminde
 
         viewBinding.buttonConfirm.setOnClickListener(onConfirmReminderClickListener);
         viewBinding.editTextPlace.setOnClickListener(onEditPlaceClickListener);
-
-        reminderData = new ReminderData();
     }
 
     private void setUpViewModel() {
@@ -69,12 +69,32 @@ public class AddReminderActivity extends AppCompatActivity implements AddReminde
         viewModel.getReminderAddedEvent().observe(this, this::handleReminderAddedEvent);
     }
 
-    private void fillReminderAttributes() {
+    private void loadReminderData() {
 
-        reminderData.setTitle(viewBinding.editTextTitle.getText().toString());
-        reminderData.setDescription(viewBinding.editTextDescription.getText().toString());
-        reminderData.setLocationName(viewBinding.editTextPlace.getText().toString());
+        String reminderExtra = ReminderData.class.getSimpleName();
+
+        if(getIntent().hasExtra(reminderExtra)) {
+
+            reminderData = getIntent().getParcelableExtra(reminderExtra);
+
+            viewBinding.editTextTitle.setText(reminderData.getTitle());
+            viewBinding.editTextDescription.setText(reminderData.getDescription());
+            viewBinding.editTextPlace.setText(reminderData.getLocationName());
+
+        } else {
+            reminderData = new ReminderData();
+        }
     }
+
+    private View.OnClickListener onConfirmReminderClickListener = __->  {
+
+        if(isReminderFieldsFilled()) {
+
+            fillReminderAttributes();
+
+            viewModel.insertReminder(reminderData);
+        }
+    };
 
     private boolean isReminderFieldsFilled() {
 
@@ -96,6 +116,13 @@ public class AddReminderActivity extends AppCompatActivity implements AddReminde
         }
 
         return allFieldsFilled;
+    }
+
+    private void fillReminderAttributes() {
+
+        reminderData.setTitle(viewBinding.editTextTitle.getText().toString());
+        reminderData.setDescription(viewBinding.editTextDescription.getText().toString());
+        reminderData.setLocationName(viewBinding.editTextPlace.getText().toString());
     }
 
     @Override
@@ -121,16 +148,6 @@ public class AddReminderActivity extends AppCompatActivity implements AddReminde
         }
     }
 
-    private View.OnClickListener onConfirmReminderClickListener = __->  {
-
-        if(isReminderFieldsFilled()) {
-
-            fillReminderAttributes();
-
-            viewModel.insertReminder(reminderData);
-        }
-    };
-
     private View.OnClickListener onEditPlaceClickListener = __-> {
 
         try {
@@ -149,6 +166,14 @@ public class AddReminderActivity extends AppCompatActivity implements AddReminde
 
     @Override
     public void handleReminderAddedEvent(Void aVoid) {
+
+        if(getCallingActivity() != null) {
+
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra(ReminderData.class.getSimpleName(), reminderData);
+            setResult(RESULT_OK, resultIntent);
+        }
+
         finish();
     }
 }
