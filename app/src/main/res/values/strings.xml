@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Closer</string>
-    <string name="action_settings">Settings</string>
+
+    <!-- Actions -->
+    <string name="action_edit">Edit</string>
 
     <!-- Reminders -->
     <string name="reminder_title_hint">Title</string>
@@ -9,5 +11,9 @@
 
     <!-- Buttons and Dialogs -->
     <string name="confirm">Confirm</string>
+    <string name="ok">OK</string>
+    <string name="permission_location_denied">Cannot access device\'s location.</string>
+    <string name="permission_location_rationale">We need to access your location to create
+        your important reminders.</string>
 
 </resources>

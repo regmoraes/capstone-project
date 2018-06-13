@@ -1,5 +1,6 @@
 package com.regmoraes.closer.domain;
 
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -32,6 +33,8 @@ public class GeofencesManager {
         this.geofencingClient = geofencingClient;
     }
 
+    // Permissions handled in Activities
+    @SuppressLint("MissingPermission")
     public void createGeofenceForReminder(Reminder reminder) {
 
         Geofence geofence = buildGeofenceForReminder(reminder);
@@ -44,6 +47,8 @@ public class GeofencesManager {
         geofencingClient.addGeofences(request, getGeofencingPendingIntent());
     }
 
+    // Permissions handled in Activities
+    @SuppressLint("MissingPermission")
     public void createGeofenceForReminders(List<Reminder> reminders) {
 
         List<Geofence> geofences = new ArrayList<>();
