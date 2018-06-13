@@ -7,7 +7,6 @@ import android.content.Intent;
 import com.regmoraes.closer.CloserApp;
 import com.regmoraes.closer.SchedulerTransformers;
 import com.regmoraes.closer.data.Reminder;
-import com.regmoraes.closer.domain.GeofencesManager;
 import com.regmoraes.closer.domain.RemindersManager;
 
 import javax.inject.Inject;
@@ -35,13 +34,10 @@ public class DoneReminderReceiver extends BroadcastReceiver {
             if(reminderId >= 0) {
 
                 remindersManager.getReminder(reminderId)
-                        .compose(SchedulerTransformers.applySingleBaseScheduler())
-                        .subscribe(
-                                reminder -> remindersManager.deleteReminder(reminder)
-                        );
+                        .flatMapCompletable(reminder -> remindersManager.deleteReminder(reminder))
+                        .compose(SchedulerTransformers.applyCompletableBaseScheduler())
+                        .subscribe();
             }
         }
     }
-
-
 }

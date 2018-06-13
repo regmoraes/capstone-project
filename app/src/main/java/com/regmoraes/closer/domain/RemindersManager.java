@@ -62,10 +62,11 @@ public class RemindersManager {
         remindersRepository.insert(reminder);
     }
 
-    public void deleteReminder(Reminder reminder) {
+    public Completable deleteReminder(Reminder reminder) {
 
-        remindersRepository.delete(reminder);
-
-        geofencesManager.deleteGeofence(reminder.getUid().toString());
+        return Completable.fromAction(() -> {
+            remindersRepository.delete(reminder);
+            geofencesManager.deleteGeofence(reminder.getUid().toString());
+        });
     }
 }

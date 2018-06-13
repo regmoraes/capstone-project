@@ -19,24 +19,24 @@ import io.reactivex.disposables.CompositeDisposable;
 class ReminderDetailViewModel extends ViewModel {
 
     private RemindersManager remindersManager;
-    private SingleLiveEvent<Void> reminderAddedEvent;
+    private SingleLiveEvent<Void> reminderDoneEvent;
     private CompositeDisposable compositeDisposable;
 
     @Inject
     public ReminderDetailViewModel(RemindersManager remindersManager) {
         this.remindersManager = remindersManager;
-        this.reminderAddedEvent = new SingleLiveEvent<>();
+        this.reminderDoneEvent = new SingleLiveEvent<>();
         this.compositeDisposable = new CompositeDisposable();
     }
 
-    void insertReminder(ReminderData reminderData) {
+    void deleteReminder(ReminderData reminderData) {
 
         Reminder reminder = ReminderData.createReminder(reminderData);
 
         compositeDisposable.add(
-                remindersManager.insertReminder(reminder)
+                remindersManager.deleteReminder(reminder)
                         .compose(SchedulerTransformers.applyCompletableBaseScheduler())
-                        .subscribe(() -> reminderAddedEvent.call())
+                        .subscribe(() -> reminderDoneEvent.call())
         );
     }
 
@@ -46,11 +46,11 @@ class ReminderDetailViewModel extends ViewModel {
         compositeDisposable.clear();
     }
 
-    LiveData<Void> getReminderAddedEvent() {
-        return reminderAddedEvent;
+    LiveData<Void> getReminderDeletedEvent() {
+        return reminderDoneEvent;
     }
 
     interface Observer {
-        void handleReminderAddedEvent(Void aVoid);
+        void handleReminderDeletedEvent(Void aVoid);
     }
 }

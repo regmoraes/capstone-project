@@ -1,5 +1,6 @@
 package com.regmoraes.closer.presentation.reminderdetail;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
@@ -8,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -26,7 +28,8 @@ import com.regmoraes.closer.presentation.addreminder.ReminderData;
 
 import javax.inject.Inject;
 
-public class ReminderDetailActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class ReminderDetailActivity extends AppCompatActivity
+        implements OnMapReadyCallback, ReminderDetailViewModel.Observer {
 
     public static int EDIT_REMINDER_REQ_CODE = 100;
 
@@ -71,7 +74,17 @@ public class ReminderDetailActivity extends AppCompatActivity implements OnMapRe
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
 
+        setUpViewModel();
+
         setUpMap();
+    }
+
+    private void setUpViewModel() {
+
+        viewModel = ViewModelProviders.of(this, viewModelFactory)
+                .get(ReminderDetailViewModel.class);
+
+        viewModel.getReminderDeletedEvent().observe(this, this::handleReminderDeletedEvent);
     }
 
     private void setUpMap() {
@@ -147,16 +160,27 @@ public class ReminderDetailActivity extends AppCompatActivity implements OnMapRe
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if(item.getItemId() == R.id.action_edit) {
+        switch (item.getItemId()) {
 
-            Intent editIntent = new Intent(this, AddReminderActivity.class);
-            editIntent.putExtra(ReminderData.class.getSimpleName(), reminderData);
-            startActivityForResult(editIntent, EDIT_REMINDER_REQ_CODE);
+            case R.id.action_edit: {
 
-            return true;
+                Intent editIntent = new Intent(this, AddReminderActivity.class);
+                editIntent.putExtra(ReminderData.class.getSimpleName(), reminderData);
+                startActivityForResult(editIntent, EDIT_REMINDER_REQ_CODE);
+
+                return true;
+            }
+
+            default: {
+                viewModel.deleteReminder(reminderData);
+                return true;
+            }
         }
+    }
 
-        return super.onOptionsItemSelected(item);
+    @Override
+    public void handleReminderDeletedEvent(Void aVoid) {
+        finish();
     }
 
     private View.OnClickListener onNavigateClickListener = __->  {
@@ -179,7 +203,10 @@ public class ReminderDetailActivity extends AppCompatActivity implements OnMapRe
             final String reminderDataExtra = ReminderData.class.getSimpleName();
 
             if(data != null && data.hasExtra(reminderDataExtra)) {
+
                 loadReminderDetail(data.getParcelableExtra(reminderDataExtra));
+
+                Toast.makeText(this, R.string.reminder_updated, Toast.LENGTH_SHORT).show();
             }
 
         } else {
