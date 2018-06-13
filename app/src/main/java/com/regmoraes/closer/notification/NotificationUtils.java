@@ -49,10 +49,9 @@ public class NotificationUtils {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID);
 
         builder.setSmallIcon(R.mipmap.ic_launcher)
-                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher))
                 .setColor(Color.RED)
                 .setContentTitle(reminder.getTitle())
-                .setContentText(reminder.getDescription())
+                .setContentText(reminder.getLocationName())
                 .setContentIntent(reminderDetailPendingIntent)
                 .addAction(createDoneAction(context, reminder.getUid()))
                 .setAutoCancel(true);

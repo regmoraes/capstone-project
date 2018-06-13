@@ -1,5 +1,6 @@
 package com.regmoraes.closer.services;
 
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -32,6 +33,13 @@ public class DoneReminderReceiver extends BroadcastReceiver {
             int reminderId = intent.getIntExtra(Reminder.REMINDER_ID, -1);
 
             if(reminderId >= 0) {
+
+                NotificationManager notificationManager =
+                        (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+                if(notificationManager != null){
+                    notificationManager.cancel(reminderId);
+                }
 
                 remindersManager.getReminder(reminderId)
                         .flatMapCompletable(reminder -> remindersManager.deleteReminder(reminder))
