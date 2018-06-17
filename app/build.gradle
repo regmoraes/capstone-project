@@ -23,8 +23,18 @@ android {
         enabled true
     }
 
+    signingConfigs {
+        release {
+            storeFile rootProject.file("keystore.jks")
+            storePassword "closer"
+            keyAlias "closer"
+            keyPassword "closer"
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
