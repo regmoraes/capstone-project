@@ -1,4 +1,4 @@
-package com.regmoraes.closer;
+package com.regmoraes.closer.background;
 
 import io.reactivex.CompletableTransformer;
 import io.reactivex.FlowableTransformer;

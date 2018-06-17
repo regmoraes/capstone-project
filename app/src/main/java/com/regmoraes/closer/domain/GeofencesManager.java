@@ -9,7 +9,7 @@ import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
 import com.regmoraes.closer.data.Reminder;
-import com.regmoraes.closer.services.GeofenceTransitionsIntentService;
+import com.regmoraes.closer.background.GeofenceTransitionsIntentService;
 
 import java.util.ArrayList;
 import java.util.List;

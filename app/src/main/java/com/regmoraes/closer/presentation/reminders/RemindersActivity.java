@@ -27,6 +27,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import static android.support.v7.widget.LinearLayoutManager.HORIZONTAL;
+import static android.support.v7.widget.LinearLayoutManager.VERTICAL;
 
 public class RemindersActivity extends AppCompatActivity implements
         RemindersItemAdapter.AdapterClickListener, RemindersViewModel.Observer {
@@ -65,7 +66,7 @@ public class RemindersActivity extends AppCompatActivity implements
     private void setUpView() {
 
         DividerItemDecoration divider = new DividerItemDecoration(
-                viewBinding.recyclerViewReminders.getContext(), HORIZONTAL);
+                viewBinding.recyclerViewReminders.getContext(), VERTICAL);
 
         remindersItemAdapter = new RemindersItemAdapter(this);
 

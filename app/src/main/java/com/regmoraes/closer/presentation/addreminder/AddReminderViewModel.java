@@ -3,7 +3,7 @@ package com.regmoraes.closer.presentation.addreminder;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
 
-import com.regmoraes.closer.SchedulerTransformers;
+import com.regmoraes.closer.background.SchedulerTransformers;
 import com.regmoraes.closer.data.Reminder;
 import com.regmoraes.closer.domain.RemindersManager;
 import com.regmoraes.closer.presentation.SingleLiveEvent;

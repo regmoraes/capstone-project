@@ -1,6 +1,6 @@
 package com.regmoraes.closer.domain;
 
-import com.regmoraes.closer.SchedulerTransformers;
+import com.regmoraes.closer.background.SchedulerTransformers;
 import com.regmoraes.closer.data.Reminder;
 import com.regmoraes.closer.data.RemindersRepository;
 

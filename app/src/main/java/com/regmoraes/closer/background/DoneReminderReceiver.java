@@ -1,4 +1,4 @@
-package com.regmoraes.closer.services;
+package com.regmoraes.closer.background;
 
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.regmoraes.closer.CloserApp;
-import com.regmoraes.closer.SchedulerTransformers;
 import com.regmoraes.closer.data.Reminder;
 import com.regmoraes.closer.domain.RemindersManager;
 

@@ -8,6 +8,8 @@ import com.regmoraes.closer.domain.RemindersManager;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 /**
  * Copyright {2018} {Rômulo Eduardo G. Moraes}
  **/
@@ -25,6 +27,9 @@ class RemindersViewModelFactory implements ViewModelProvider.Factory {
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
 
         if(modelClass.isAssignableFrom(RemindersViewModel.class)) {
+
+            Timber.d("New ViewModel created");
+
             //noinspection unchecked
             return (T) new RemindersViewModel(remindersManager);
 

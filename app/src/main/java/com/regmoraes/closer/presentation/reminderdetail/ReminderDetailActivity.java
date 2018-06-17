@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,6 +26,7 @@ import com.regmoraes.closer.R;
 import com.regmoraes.closer.databinding.ActivityReminderDetailBinding;
 import com.regmoraes.closer.presentation.addreminder.AddReminderActivity;
 import com.regmoraes.closer.presentation.addreminder.ReminderData;
+import com.regmoraes.closer.widget.RemindersWidget;
 
 import javax.inject.Inject;
 
@@ -32,6 +34,7 @@ public class ReminderDetailActivity extends AppCompatActivity
         implements OnMapReadyCallback, ReminderDetailViewModel.Observer {
 
     public static int EDIT_REMINDER_REQ_CODE = 100;
+    private static float MAP_ZOOM = 17;
 
     private ActivityReminderDetailBinding viewBinding;
     private ReminderDetailViewModel viewModel;
@@ -70,8 +73,7 @@ public class ReminderDetailActivity extends AppCompatActivity
 
         setSupportActionBar(viewBinding.appBar.toolbar);
         if(getSupportActionBar() != null) {
-            getSupportActionBar().setHomeButtonEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
         setUpViewModel();
@@ -140,12 +142,12 @@ public class ReminderDetailActivity extends AppCompatActivity
             LatLng position = new LatLng(reminderData.getLatitude(), reminderData.getLongitude());
 
             reminderMarker = map.addMarker(new MarkerOptions().position(position)
-                    .title(reminderData.getTitle()));
+                    .title(reminderData.getDescription()));
 
             reminderMarker.showInfoWindow();
 
             CameraPosition cameraPosition = new CameraPosition.Builder().target(position)
-                    .zoom(17).build();
+                    .zoom(MAP_ZOOM).build();
 
             map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
@@ -171,6 +173,11 @@ public class ReminderDetailActivity extends AppCompatActivity
                 return true;
             }
 
+            case android.R.id.home: {
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
+            }
+
             default: {
                 viewModel.deleteReminder(reminderData);
                 return true;
@@ -180,6 +187,7 @@ public class ReminderDetailActivity extends AppCompatActivity
 
     @Override
     public void handleReminderDeletedEvent(Void aVoid) {
+        RemindersWidget.updateWidget(getApplicationContext());
         finish();
     }
 

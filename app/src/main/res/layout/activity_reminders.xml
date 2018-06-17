@@ -24,12 +24,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/fab_margin"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
             app:fabSize="normal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:srcCompat="@drawable/ic_add" />
+            app:srcCompat="@drawable/ic_add"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView_reminders"
@@ -48,7 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:layout_marginTop="8dp"
-            android:text="You have no reminders"
+            android:text="@string/reminders_empty"
             android:textSize="18sp"
             android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"

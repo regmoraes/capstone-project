@@ -4,7 +4,9 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -16,6 +18,7 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 import com.regmoraes.closer.CloserApp;
 import com.regmoraes.closer.R;
 import com.regmoraes.closer.databinding.ActivityAddReminderBinding;
+import com.regmoraes.closer.widget.RemindersWidget;
 
 import javax.inject.Inject;
 
@@ -57,8 +60,12 @@ public class AddReminderActivity extends AppCompatActivity implements AddReminde
 
         setSupportActionBar(viewBinding.appBar.toolbar);
 
+        if(getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
         viewBinding.buttonConfirm.setOnClickListener(onConfirmReminderClickListener);
-        viewBinding.editTextPlace.setOnClickListener(onEditPlaceClickListener);
+        viewBinding.textViewPlace.setOnClickListener(onEditPlaceClickListener);
     }
 
     private void setUpViewModel() {
@@ -79,7 +86,7 @@ public class AddReminderActivity extends AppCompatActivity implements AddReminde
 
             viewBinding.editTextTitle.setText(reminderData.getTitle());
             viewBinding.editTextDescription.setText(reminderData.getDescription());
-            viewBinding.editTextPlace.setText(reminderData.getLocationName());
+            viewBinding.textViewPlace.setText(reminderData.getLocationName());
 
         } else {
             reminderData = new ReminderData();
@@ -110,8 +117,8 @@ public class AddReminderActivity extends AppCompatActivity implements AddReminde
             allFieldsFilled = false;
         }
 
-        if(viewBinding.editTextPlace.getText().toString().length() == 0) {
-            //viewBinding.editTextPlace.setError();
+        if(viewBinding.textViewPlace.getText().toString().length() == 0) {
+            //viewBinding.textViewPlace.setError();
             allFieldsFilled = false;
         }
 
@@ -122,7 +129,7 @@ public class AddReminderActivity extends AppCompatActivity implements AddReminde
 
         reminderData.setTitle(viewBinding.editTextTitle.getText().toString());
         reminderData.setDescription(viewBinding.editTextDescription.getText().toString());
-        reminderData.setLocationName(viewBinding.editTextPlace.getText().toString());
+        reminderData.setLocationName(viewBinding.textViewPlace.getText().toString());
     }
 
     @Override
@@ -139,7 +146,7 @@ public class AddReminderActivity extends AppCompatActivity implements AddReminde
                 reminderData.setLatitude(place.getLatLng().latitude);
                 reminderData.setLongitude(place.getLatLng().longitude);
 
-                viewBinding.editTextPlace.setText(placeName);
+                viewBinding.textViewPlace.setText(placeName);
 
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(this, data);
@@ -174,6 +181,21 @@ public class AddReminderActivity extends AppCompatActivity implements AddReminde
             setResult(RESULT_OK, resultIntent);
         }
 
+        RemindersWidget.updateWidget(getApplicationContext());
+
         finish();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
