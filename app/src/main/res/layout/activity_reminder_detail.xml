@@ -36,6 +36,7 @@
             android:clickable="true"
             android:focusable="true"
             app:fabSize="normal"
+            android:contentDescription="@string/accessibility_navigate_label"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@drawable/ic_navigation" />

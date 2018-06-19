@@ -12,7 +12,10 @@
     <string name="reminder_place_hint">Select a place</string>
     <string name="reminders_empty">You have no reminders</string>
 
+    <!-- Accessibility -->
     <string name="accessibility_location_label">Location marker</string>
+    <string name="accessibility_add_reminder_label">Add reminder</string>
+    <string name="accessibility_navigate_label">Start navigation</string>
 
     <!-- Buttons and Dialogs -->
     <string name="save">Save</string>
