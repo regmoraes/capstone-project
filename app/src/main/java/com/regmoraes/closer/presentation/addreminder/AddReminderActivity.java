@@ -4,7 +4,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,7 +43,19 @@ public class AddReminderActivity extends AppCompatActivity implements AddReminde
 
         setUpViewModel();
 
-        loadReminderData();
+        if(savedInstanceState != null) {
+            reminderData = savedInstanceState.getParcelable(ReminderData.class.getSimpleName());
+
+        } else {
+
+            String reminderExtra = ReminderData.class.getSimpleName();
+
+            if(getIntent().hasExtra(reminderExtra)) {
+                reminderData = getIntent().getParcelableExtra(reminderExtra);
+            }
+        }
+
+        loadReminderData(reminderData);
     }
 
     private void setUpInjections() {
@@ -76,20 +87,16 @@ public class AddReminderActivity extends AppCompatActivity implements AddReminde
         viewModel.getReminderAddedEvent().observe(this, this::handleReminderAddedEvent);
     }
 
-    private void loadReminderData() {
+    private void loadReminderData(ReminderData reminderData) {
 
-        String reminderExtra = ReminderData.class.getSimpleName();
+        if(reminderData == null) {
+            this.reminderData = new ReminderData();
 
-        if(getIntent().hasExtra(reminderExtra)) {
-
-            reminderData = getIntent().getParcelableExtra(reminderExtra);
+        } else {
 
             viewBinding.editTextTitle.setText(reminderData.getTitle());
             viewBinding.editTextDescription.setText(reminderData.getDescription());
             viewBinding.textViewPlace.setText(reminderData.getLocationName());
-
-        } else {
-            reminderData = new ReminderData();
         }
     }
 
@@ -108,17 +115,17 @@ public class AddReminderActivity extends AppCompatActivity implements AddReminde
         boolean allFieldsFilled = true;
 
         if(viewBinding.editTextTitle.getText().toString().length() == 0) {
-            //viewBinding.editTextDescription.setError();
+            viewBinding.editTextDescription.setError(getString(R.string.empty_field));
             allFieldsFilled = false;
         }
 
         if(viewBinding.editTextDescription.getText().toString().length() == 0) {
-            //viewBinding.editTextDescription.setError();
+            viewBinding.editTextDescription.setError(getString(R.string.empty_field));
             allFieldsFilled = false;
         }
 
         if(viewBinding.textViewPlace.getText().toString().length() == 0) {
-            //viewBinding.textViewPlace.setError();
+            viewBinding.textViewPlace.setError(getString(R.string.empty_field));
             allFieldsFilled = false;
         }
 
@@ -197,5 +204,11 @@ public class AddReminderActivity extends AppCompatActivity implements AddReminde
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(ReminderData.class.getSimpleName(), reminderData);
+        super.onSaveInstanceState(outState);
     }
 }
